@@ -26,12 +26,13 @@ export function useSearch(query: string): UseSearchResult {
       return;
     }
 
+    // Show skeleton immediately — don't wait for the debounce to fire
+    setLoading(true);
+    setError(null);
+
     const timer = setTimeout(async () => {
       abortRef.current?.abort();
       abortRef.current = new AbortController();
-
-      setLoading(true);
-      setError(null);
 
       try {
         const result = await fetchSearch(trimmed, abortRef.current.signal);

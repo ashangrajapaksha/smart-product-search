@@ -19,7 +19,9 @@ interface RawCandidate extends IProduct {
 
 export async function searchProducts(
   query: string,
-  limit = DEFAULT_LIMIT
+  limit = DEFAULT_LIMIT,
+  perCategory = MAX_PER_CATEGORY,
+  category?: string
 ): Promise<SearchResponse> {
   const q = query.trim();
 
@@ -43,23 +45,32 @@ export async function searchProducts(
   let candidates: Array<IProduct & { score: number }>;
 
   if (pass1.length > 0) {
+    // Normalise textScore relative to the highest score in this result set so
+    // that the full 0–1 range is used and relative ordering is preserved.
+    const maxTextScore = Math.max(...pass1.map((p) => p.textScore), 1);
     candidates = pass1.map((p) => ({
       ...p,
-      score: scoreProduct(p, p.textScore, q),
+      score: scoreProduct(p, p.textScore / maxTextScore, q),
     }));
   } else {
     // Pass 2 — Levenshtein fallback (only when $text returns nothing)
+    // fuzzy score is already 0–1, pass it directly as the normalised textScore
     const fuzzyResults = await fuzzySearch(q);
     candidates = fuzzyResults.map((p) => ({
       ...p,
-      // fuzzy score is already 0–1; scale to textScore range for consistent scoring
-      score: scoreProduct(p, p.score * 10, q),
+      score: scoreProduct(p, p.score, q),
     }));
   }
 
-  const sorted = applyScoreFloor(candidates)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit);
+  let sorted = applyScoreFloor(candidates)
+    .sort((a, b) => b.score - a.score);
+
+  // When a category filter is provided, restrict to that category only
+  if (category) {
+    sorted = sorted.filter((p) => p.category === category);
+  }
+
+  sorted = sorted.slice(0, limit);
 
   const withHighlights: SearchResultProduct[] = sorted.map((p) => ({
     id: p.id,
@@ -80,13 +91,16 @@ export async function searchProducts(
     categoryMap.get(p.category)!.push(p);
   }
 
+  const perCategoryCap = perCategory;
+  const categoryCap = category ? Infinity : MAX_CATEGORIES;
+
   const categories: SearchCategory[] = Array.from(categoryMap.entries())
     .map(([name, products]) => ({
       name,
       count: products.length,
-      products: products.slice(0, MAX_PER_CATEGORY),
+      products: products.slice(0, perCategoryCap),
     }))
-    .slice(0, MAX_CATEGORIES);
+    .slice(0, categoryCap);
 
   return { query: q, total: sorted.length, categories };
 }

@@ -39,5 +39,11 @@ Thumbs.db
 # Testing
 coverage/
 
+# Editor
+.vscode/
+
+# Docker volumes
+mongo-data/
+
 # Misc
 *.tsbuildinfo

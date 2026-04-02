@@ -1,16 +1,34 @@
-import { useState, useRef, useCallback, useId } from 'react';
+import { useState, useRef, useCallback, useId, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSearch } from '../../hooks/useSearch';
 import { MegaMenu } from '../MegaMenu';
 
-export function SearchBar() {
-  const [query, setQuery] = useState('');
+interface SearchBarProps {
+  defaultQuery?: string;
+}
+
+export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
+  const [query, setQuery] = useState(defaultQuery);
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const id = useId();
+  const navigate = useNavigate();
 
   const { data, loading, error } = useSearch(query);
 
-  const showMenu = open && query.trim().length >= 2 && (loading || data !== null);
+  const showMenu = open && query.trim().length >= 2;
+
+  // Close when clicking outside the entire search widget (input + dropdown)
+  useEffect(() => {
+    function handleMouseDown(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
@@ -24,7 +42,15 @@ export function SearchBar() {
     }
   };
 
-  const handleClose = useCallback(() => setOpen(false), []);
+  const handleClose = useCallback(() => {
+    setOpen(false);
+    inputRef.current?.focus();
+  }, []);
+
+  const handleViewAll = useCallback(() => {
+    setOpen(false);
+    navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+  }, [query, navigate]);
 
   const handleClear = () => {
     setQuery('');
@@ -33,7 +59,7 @@ export function SearchBar() {
   };
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto">
+    <div ref={containerRef} className="relative w-full max-w-4xl mx-auto">
       {/* Search input */}
       <div className={`flex items-center gap-3 px-4 py-3 bg-white rounded-2xl border-2 transition-all duration-200 shadow-sm
         ${open && query.length >= 2
@@ -41,7 +67,6 @@ export function SearchBar() {
           : 'border-gray-200 hover:border-gray-300'
         }`}
       >
-        {/* Search icon */}
         <svg className="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
@@ -64,7 +89,6 @@ export function SearchBar() {
           aria-controls={showMenu ? `${id}-menu` : undefined}
         />
 
-        {/* Loading spinner */}
         {loading && (
           <svg className="w-4 h-4 text-indigo-400 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -72,9 +96,9 @@ export function SearchBar() {
           </svg>
         )}
 
-        {/* Clear button */}
         {query && !loading && (
           <button
+            onMouseDown={(e) => e.preventDefault()}
             onClick={handleClear}
             className="shrink-0 text-gray-300 hover:text-gray-500 transition-colors"
             aria-label="Clear search"
@@ -86,28 +110,18 @@ export function SearchBar() {
         )}
       </div>
 
-      {/* Error state */}
       {error && (
         <p className="absolute top-full mt-1 left-0 text-xs text-red-500 px-1">{error}</p>
       )}
 
-      {/* Mega menu */}
-      {showMenu && data && (
+      {showMenu && (
         <MegaMenu
           id={`${id}-menu`}
-          data={data}
+          data={data ?? { query, total: 0, categories: [] }}
           query={query}
           loading={loading}
           onClose={handleClose}
-        />
-      )}
-      {showMenu && !data && loading && (
-        <MegaMenu
-          id={`${id}-menu`}
-          data={{ query, total: 0, categories: [] }}
-          query={query}
-          loading={true}
-          onClose={handleClose}
+          onViewAll={handleViewAll}
         />
       )}
     </div>

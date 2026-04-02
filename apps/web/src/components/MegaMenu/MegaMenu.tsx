@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import type { SearchResponse } from '@nx-react-nestjs-ts-boilerplate/shared';
 import { CategoryColumn } from './CategoryColumn';
 
@@ -8,6 +7,7 @@ interface Props {
   query: string;
   loading: boolean;
   onClose: () => void;
+  onViewAll: () => void;
 }
 
 function SkeletonCard() {
@@ -36,45 +36,30 @@ function SkeletonColumn() {
   );
 }
 
-export function MegaMenu({ id, data, query, loading, onClose }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        onClose();
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [onClose]);
-
+export function MegaMenu({ id, data, query, loading, onClose, onViewAll }: Props) {
   const hasResults = data.categories.length > 0;
-  const columnCount = loading ? 3 : data.categories.length;
 
   return (
     <div
-      ref={ref}
       id={id}
       className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl shadow-2xl shadow-gray-200/80 border border-gray-100 z-50 overflow-hidden"
       role="dialog"
       aria-label="Search results"
     >
       {/* Results grid */}
-      <div className="p-4">
+      <div className="p-4 overflow-auto max-h-[70vh]">
         {loading ? (
-          <div
-            className="grid gap-4"
-            style={{ gridTemplateColumns: `repeat(${Math.min(columnCount, 5)}, minmax(0, 1fr))` }}
-          >
+          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(3, minmax(160px, 1fr))' }}>
             <SkeletonColumn />
             <SkeletonColumn />
             <SkeletonColumn />
           </div>
         ) : hasResults ? (
           <div
-            className="grid gap-4"
-            style={{ gridTemplateColumns: `repeat(${Math.min(data.categories.length, 5)}, minmax(0, 1fr))` }}
+            className="grid gap-3"
+            style={{
+              gridTemplateColumns: `repeat(${Math.min(data.categories.length, 5)}, minmax(160px, 1fr))`,
+            }}
           >
             {data.categories.map((cat) => (
               <CategoryColumn key={cat.name} category={cat} query={query} />
@@ -99,7 +84,8 @@ export function MegaMenu({ id, data, query, loading, onClose }: Props) {
           </span>
           <button
             className="text-xs font-medium text-indigo-500 hover:text-indigo-700 transition-colors"
-            onClick={onClose}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onViewAll}
           >
             View all →
           </button>

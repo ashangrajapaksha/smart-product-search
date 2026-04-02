@@ -13,11 +13,7 @@
     "lint:fix": "nx run-many --target=lint --all --fix",
     "env:copy:dev": "shx cp apps/api/.env.development apps/api/.env",
     "env:copy:prod": "shx cp apps/api/.env.production apps/api/.env",
-    "docker:build": "docker compose build",
-    "docker:up": "docker compose up",
-    "docker:down": "docker compose down",
-    "db:up": "docker compose up mongo -d",
-    "db:down": "docker compose down mongo"
+    "db:seed": "dotenv -e apps/api/.env.development -- ts-node --project apps/api/tsconfig.app.json apps/api/src/database/seed.ts"
   },
   "private": true,
   "devDependencies": {

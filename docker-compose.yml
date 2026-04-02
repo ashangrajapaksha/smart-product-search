@@ -1,0 +1,49 @@
+version: '3.8'
+
+networks:
+  app-net:
+    driver: bridge
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+    restart: always
+    networks:
+      - app-net
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - '8000:8000'
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - MONGODB_URI=mongodb://mongo:27017/app_prod
+    restart: always
+    networks:
+      - app-net
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:8
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-net
+    restart: always
+
+volumes:
+  mongo-data:

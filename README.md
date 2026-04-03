@@ -7,13 +7,13 @@ Built on an Nx monorepo — React 19 + Vite frontend, Express 5 backend, MongoDB
 
 ## Stack
 
-| Layer | Technology |
-|---|---|
-| Monorepo | Nx 22 |
-| Frontend | React 19, Vite, React Router v7, Tailwind CSS |
-| Backend | Express 5, TypeScript |
-| Database | MongoDB via Mongoose |
-| Package Manager | pnpm |
+| Layer           | Technology                                    |
+| --------------- | --------------------------------------------- |
+| Monorepo        | Nx 22                                         |
+| Frontend        | React 19, Vite, React Router v7, Tailwind CSS |
+| Backend         | Express 5, TypeScript                         |
+| Database        | MongoDB via Mongoose                          |
+| Package Manager | pnpm                                          |
 
 ---
 
@@ -54,6 +54,7 @@ pnpm db:seed
 This imports all 50 products from `apps/api/src/database/products.json` into MongoDB using `bulkWrite` upserts — safe to run multiple times without duplicating data.
 
 Expected output:
+
 ```
 Connecting to MongoDB...
 Connected.
@@ -80,41 +81,41 @@ Open `http://localhost:3000` and start searching.
 
 ## Scripts
 
-| Command | Description |
-|---|---|
-| `pnpm dev:web` | Frontend dev server (port 3000) |
-| `pnpm dev:api` | Backend dev server (port 8000) |
-| `pnpm db:seed` | Seed MongoDB with 50 products |
-| `pnpm build:all` | Production build (both apps) |
-| `pnpm lint` | Lint all apps |
+| Command          | Description                     |
+| ---------------- | ------------------------------- |
+| `pnpm dev:web`   | Frontend dev server (port 3000) |
+| `pnpm dev:api`   | Backend dev server (port 8000)  |
+| `pnpm db:seed`   | Seed MongoDB with 50 products   |
+| `pnpm build:all` | Production build (both apps)    |
+| `pnpm lint`      | Lint all apps                   |
 
 ---
 
 ## API Endpoints
 
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/api/health` | Health check — returns MongoDB connection status |
-| `GET` | `/api/search` | Product search |
+| Method | Path          | Description                                      |
+| ------ | ------------- | ------------------------------------------------ |
+| `GET`  | `/api/health` | Health check — returns MongoDB connection status |
+| `GET`  | `/api/search` | Product search                                   |
 
 ### Search query parameters
 
-| Param | Default | Max | Description |
-|---|---|---|---|
-| `q` | required | — | Search query (min 2 chars) |
-| `limit` | 15 | 100 | Total results to return |
-| `perCategory` | 3 | 50 | Products shown per category column |
-| `category` | — | — | Filter to a single category (used by "Show more") |
+| Param         | Default  | Max | Description                                       |
+| ------------- | -------- | --- | ------------------------------------------------- |
+| `q`           | required | —   | Search query (min 2 chars)                        |
+| `limit`       | 15       | 100 | Total results to return                           |
+| `perCategory` | 3        | 50  | Products shown per category column                |
+| `category`    | —        | —   | Filter to a single category (used by "Show more") |
 
 ### Search response shape
 
 ```ts
 {
   query: string;
-  total: number;           // total matched products across all categories
+  total: number; // total matched products across all categories
   categories: Array<{
-    name: string;          // e.g. "Electronics"
-    count: number;         // total hits in this category (before per-column cap)
+    name: string; // e.g. "Electronics"
+    count: number; // total hits in this category (before per-column cap)
     products: Array<{
       id: string;
       name: string;
@@ -123,8 +124,8 @@ Open `http://localhost:3000` and start searching.
       price: number;
       stock: number;
       rating: number;
-      score: number;       // composite relevance score (0–1), useful for debugging
-      highlight: string;   // most relevant sentence from description
+      score: number; // composite relevance score (0–1), useful for debugging
+      highlight: string; // most relevant sentence from description
     }>;
   }>;
 }
@@ -152,20 +153,20 @@ If Pass 1 returns **zero results**, the fuzzy fallback runs. It loads all produc
 
 Products with minimum edit distance ≤ 2 are kept:
 
-| Query | Closest word | Distance | Result |
-|---|---|---|---|
-| `samsng` | `samsung` | 1 | Returned |
-| `wirelss` | `wireless` | 1 | Returned |
-| `headphnes` | `headphones` | 1 | Returned |
-| `yogga` | `yoga` | 2 | Returned |
+| Query       | Closest word | Distance | Result   |
+| ----------- | ------------ | -------- | -------- |
+| `samsng`    | `samsung`    | 1        | Returned |
+| `wirelss`   | `wireless`   | 1        | Returned |
+| `headphnes` | `headphones` | 1        | Returned |
+| `yogga`     | `yoga`       | 2        | Returned |
 
 Distance is converted to a 0–1 score: `score = 1 - distance × 0.4`
 
-| Distance | Score |
-|---|---|
-| 0 (exact) | 1.0 |
-| 1 | 0.6 |
-| 2 | 0.2 |
+| Distance  | Score |
+| --------- | ----- |
+| 0 (exact) | 1.0   |
+| 1         | 0.6   |
+| 2         | 0.2   |
 
 ---
 
@@ -181,17 +182,18 @@ score = (normalised textScore) × 0.50
       + tagMatchBonus           × 0.05
 ```
 
-| Signal | Weight | Rationale |
-|---|---|---|
-| MongoDB text score (normalised) | 0.50 | Primary relevance — field weights baked into index |
-| Rating (0–1) | 0.20 | Users prefer highly-rated products |
-| Stock availability | 0.15 | In-stock items are more immediately useful |
-| Name match bonus | 0.10 | Rewards close name matches |
-| Tag match bonus | 0.05 | Small boost when query token appears in tags |
+| Signal                          | Weight | Rationale                                          |
+| ------------------------------- | ------ | -------------------------------------------------- |
+| MongoDB text score (normalised) | 0.50   | Primary relevance — field weights baked into index |
+| Rating (0–1)                    | 0.20   | Users prefer highly-rated products                 |
+| Stock availability              | 0.15   | In-stock items are more immediately useful         |
+| Name match bonus                | 0.10   | Rewards close name matches                         |
+| Tag match bonus                 | 0.05   | Small boost when query token appears in tags       |
 
 **textScore normalisation:** MongoDB returns raw floats (e.g. 1.2, 3.6). Dividing by the highest score in the result set maps them to 0–1 relative to each other, so the best match always gets 1.0 and the weights remain meaningful.
 
 **nameMatchBonus tiers:**
+
 - Query exactly equals product name → 1.0
 - All query tokens found in name → 0.8
 - Some query tokens found in name → 0.4

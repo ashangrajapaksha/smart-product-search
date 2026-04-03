@@ -1,14 +1,14 @@
 import { connectDatabase } from './database';
 import { createApp } from './app';
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 8000;
 
 async function bootstrap() {
   await connectDatabase();
 
   const app = createApp();
 
-  const server = app.listen(PORT, () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running at http://localhost:${PORT}/api`);
   });
 

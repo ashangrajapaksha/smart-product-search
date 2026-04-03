@@ -3,6 +3,8 @@
 A typo-tolerant, relevance-ranked product search with a mega menu UI.
 Built on an Nx monorepo — React 19 + Vite frontend, Express 5 backend, MongoDB.
 
+**Live demo:** https://smart-search-web.web.app
+
 ---
 
 ## Stack

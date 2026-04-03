@@ -46,8 +46,9 @@ export function MegaMenu({ id, data, query, loading, onClose, onViewAll }: Props
       role="dialog"
       aria-label="Search results"
     >
-      {/* Results grid */}
-      <div className="p-4 overflow-auto max-h-[70vh]">
+      {/* No pt on the scroll container — top padding lives inside the sticky
+           header so items have nowhere to scroll above the stuck header */}
+      <div className="px-4 pb-4 overflow-auto max-h-[70vh]">
         {loading ? (
           <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(3, minmax(160px, 1fr))' }}>
             <SkeletonColumn />

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useId, useEffect } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSearch } from '../../hooks/useSearch';
 import { MegaMenu } from '../MegaMenu';
@@ -77,7 +77,7 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
           type="search"
           autoComplete="off"
           spellCheck={false}
-          placeholder="Search products… try 'wirelss', 'samsng', or 'headphones'"
+          placeholder="Search products…"
           value={query}
           onChange={handleChange}
           onKeyDown={handleKeyDown}

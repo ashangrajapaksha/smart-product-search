@@ -23,8 +23,7 @@ function HomePage() {
           <span className="text-indigo-500">you&rsquo;re looking for</span>
         </h1>
         <p className="text-lg text-gray-500 max-w-xl mx-auto mb-10">
-          Typo-tolerant, relevance-ranked search across 50 products in 6 categories.
-          Try <code className="bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded text-sm">&ldquo;wirelss headphones&rdquo;</code> or <code className="bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded text-sm">&ldquo;samsng&rdquo;</code>.
+          Typo-tolerant, relevance-ranked search products in 6 categories.
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           {['Electronics', 'Clothing', 'Home', 'Sports', 'Beauty', 'Books'].map((cat) => (

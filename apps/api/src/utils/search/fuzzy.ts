@@ -1,4 +1,4 @@
-import { Product } from '../database/product.model';
+import { Product } from '../../models/product.model';
 import type { IProduct } from '@nx-react-nestjs-ts-boilerplate/shared';
 
 function levenshtein(a: string, b: string): number {

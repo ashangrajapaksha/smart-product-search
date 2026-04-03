@@ -41,8 +41,8 @@ export function CategoryColumn({ category, query }: Props) {
 
   return (
     <div className="flex flex-col gap-2 min-w-0">
-      {/* Column header */}
-      <div className="flex items-center gap-1.5 pb-2 border-b border-gray-100">
+      {/* Column header — sticky within the mega menu scroll container */}
+      <div className="sticky top-0 z-20 bg-white pt-4 pb-2 border-b border-gray-100 flex items-center gap-1.5">
         <span className="text-base leading-none">{icon}</span>
         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
           {category.name}

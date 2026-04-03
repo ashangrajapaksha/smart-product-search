@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import path from 'path';
 import fs from 'fs';
-import { Product } from './product.model';
+import { Product } from '../models/product.model';
 
 async function seed() {
   const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/smart-product-search';

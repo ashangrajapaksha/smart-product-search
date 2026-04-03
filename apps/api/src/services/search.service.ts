@@ -4,10 +4,10 @@ import type {
   SearchResultProduct,
   IProduct,
 } from '@nx-react-nestjs-ts-boilerplate/shared';
-import { Product } from '../database/product.model';
-import { fuzzySearch } from './fuzzy';
-import { scoreProduct, applyScoreFloor } from './scorer';
-import { extractHighlight } from './highlight';
+import { Product } from '../models/product.model';
+import { fuzzySearch } from '../utils/search/fuzzy';
+import { scoreProduct, applyScoreFloor } from '../utils/search/scorer';
+import { extractHighlight } from '../utils/search/highlight';
 
 const MAX_CATEGORIES = 5;
 const MAX_PER_CATEGORY = 3;

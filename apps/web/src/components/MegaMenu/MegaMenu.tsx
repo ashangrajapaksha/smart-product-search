@@ -8,6 +8,7 @@ interface Props {
   loading: boolean;
   onClose: () => void;
   onViewAll: () => void;
+  onReturnFocus: () => void;
 }
 
 function SkeletonCard() {
@@ -36,8 +37,23 @@ function SkeletonColumn() {
   );
 }
 
-export function MegaMenu({ id, data, query, loading, onClose, onViewAll }: Props) {
+export function MegaMenu({ id, data, query, loading, onClose, onViewAll, onReturnFocus }: Props) {
   const hasResults = data.categories.length > 0;
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+    const cards = Array.from(
+      e.currentTarget.querySelectorAll<HTMLElement>('[data-card]')
+    );
+    const idx = cards.indexOf(document.activeElement as HTMLElement);
+    if (e.key === 'ArrowDown') {
+      (cards[idx + 1] ?? cards[0])?.focus();
+    } else {
+      if (idx <= 0) onReturnFocus();
+      else cards[idx - 1]?.focus();
+    }
+  }
 
   return (
     <div
@@ -45,12 +61,13 @@ export function MegaMenu({ id, data, query, loading, onClose, onViewAll }: Props
       className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl shadow-2xl shadow-gray-200/80 border border-gray-100 z-50 overflow-hidden"
       role="dialog"
       aria-label="Search results"
+      onKeyDown={handleKeyDown}
     >
       {/* No pt on the scroll container — top padding lives inside the sticky
            header so items have nowhere to scroll above the stuck header */}
       <div className="px-4 pb-4 overflow-auto max-h-[70vh]">
         {loading ? (
-          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(3, minmax(160px, 1fr))' }}>
+          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
             <SkeletonColumn />
             <SkeletonColumn />
             <SkeletonColumn />
@@ -58,9 +75,7 @@ export function MegaMenu({ id, data, query, loading, onClose, onViewAll }: Props
         ) : hasResults ? (
           <div
             className="grid gap-3"
-            style={{
-              gridTemplateColumns: `repeat(${Math.min(data.categories.length, 5)}, minmax(160px, 1fr))`,
-            }}
+            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}
           >
             {data.categories.map((cat) => (
               <CategoryColumn key={cat.name} category={cat} query={query} />

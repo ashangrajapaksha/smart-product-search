@@ -44,13 +44,13 @@ export function SearchPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
       {/* Header */}
       <header className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3 sm:gap-4">
           <button
             onClick={() => navigate('/')}
             className="flex items-center gap-2 shrink-0 hover:opacity-70 transition-opacity"
           >
             <span className="text-xl">🔍</span>
-            <span className="font-bold text-gray-800 text-lg tracking-tight">SmartSearch</span>
+            <span className="hidden sm:inline font-bold text-gray-800 text-lg tracking-tight">SmartSearch</span>
           </button>
 
           <div className="flex-1">
@@ -70,7 +70,7 @@ export function SearchPage() {
       </header>
 
       {/* Results */}
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Summary bar */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-gray-500">

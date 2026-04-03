@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSearch } from '../../hooks/useSearch';
+import { useSearchHistory } from '../../hooks/useSearchHistory';
 import { MegaMenu } from '../MegaMenu';
+import { SearchHistory } from './SearchHistory';
 
 interface SearchBarProps {
   defaultQuery?: string;
@@ -16,8 +18,15 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
   const navigate = useNavigate();
 
   const { data, loading, error } = useSearch(query);
+  const [history, saveQuery, clearHistory] = useSearchHistory();
 
-  const showMenu = open && query.trim().length >= 2;
+  // Save query to history whenever a search returns results
+  useEffect(() => {
+    if (data && data.total > 0) saveQuery(query.trim());
+  }, [data]);
+
+  const showHistory = open && query.trim().length === 0 && history.length > 0;
+  const showMenu    = open && query.trim().length >= 2;
 
   // Close when clicking outside the entire search widget (input + dropdown)
   useEffect(() => {
@@ -40,7 +49,17 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
       setOpen(false);
       inputRef.current?.blur();
     }
+    if (e.key === 'ArrowDown' && showMenu) {
+      e.preventDefault();
+      const menuEl = document.getElementById(`${id}-menu`);
+      const firstCard = menuEl?.querySelector<HTMLElement>('[data-card]');
+      firstCard?.focus();
+    }
   };
+
+  const handleReturnFocus = useCallback(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const handleClose = useCallback(() => {
     setOpen(false);
@@ -48,9 +67,15 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
   }, []);
 
   const handleViewAll = useCallback(() => {
+    saveQuery(query.trim());
     setOpen(false);
     navigate(`/search?q=${encodeURIComponent(query.trim())}`);
-  }, [query, navigate]);
+  }, [query, navigate, saveQuery]);
+
+  const handleHistorySelect = useCallback((q: string) => {
+    setQuery(q);
+    setOpen(true);
+  }, []);
 
   const handleClear = () => {
     setQuery('');
@@ -74,7 +99,7 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
         <input
           ref={inputRef}
           id={id}
-          type="search"
+          type="text"
           autoComplete="off"
           spellCheck={false}
           placeholder="Search products…"
@@ -114,6 +139,14 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
         <p className="absolute top-full mt-1 left-0 text-xs text-red-500 px-1">{error}</p>
       )}
 
+      {showHistory && (
+        <SearchHistory
+          history={history}
+          onSelect={handleHistorySelect}
+          onClear={clearHistory}
+        />
+      )}
+
       {showMenu && (
         <MegaMenu
           id={`${id}-menu`}
@@ -122,6 +155,7 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
           loading={loading}
           onClose={handleClose}
           onViewAll={handleViewAll}
+          onReturnFocus={handleReturnFocus}
         />
       )}
     </div>

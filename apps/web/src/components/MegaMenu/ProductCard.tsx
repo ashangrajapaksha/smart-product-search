@@ -63,7 +63,9 @@ export function ProductCard({ product, query }: Props) {
 
   return (
     <div
-      className={`group flex flex-col gap-1 p-2.5 rounded-lg border transition-all duration-150 cursor-pointer
+      tabIndex={0}
+      data-card
+      className={`group flex flex-col gap-1 p-2.5 rounded-lg border transition-all duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-300
         ${inStock
           ? 'border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/40 hover:shadow-sm'
           : 'border-gray-100 bg-gray-50/50 opacity-55'

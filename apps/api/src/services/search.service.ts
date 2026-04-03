@@ -1,13 +1,13 @@
 import type {
-  SearchResponse,
-  SearchCategory,
-  SearchResultProduct,
   IProduct,
+  SearchCategory,
+  SearchResponse,
+  SearchResultProduct,
 } from '@nx-react-nestjs-ts-boilerplate/shared';
 import { Product } from '../models/product.model';
 import { fuzzySearch } from '../utils/search/fuzzy';
-import { scoreProduct, applyScoreFloor } from '../utils/search/scorer';
 import { extractHighlight } from '../utils/search/highlight';
+import { applyScoreFloor, scoreProduct } from '../utils/search/scorer';
 
 const MAX_CATEGORIES = 5;
 const MAX_PER_CATEGORY = 3;
@@ -24,6 +24,8 @@ export async function searchProducts(
   category?: string
 ): Promise<SearchResponse> {
   const q = query.trim();
+
+  console.log("ABC",q)
 
   // Pass 1 — MongoDB $text search using the weighted text index
   const pass1 = await Product.find(

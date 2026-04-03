@@ -6,10 +6,10 @@ function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
       <header className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2 shrink-0">
             <span className="text-xl">🔍</span>
-            <span className="font-bold text-gray-800 text-lg tracking-tight">SmartSearch</span>
+            <span className="hidden sm:inline font-bold text-gray-800 text-lg tracking-tight">SmartSearch</span>
           </div>
           <div className="flex-1">
             <SearchBar />
@@ -17,12 +17,12 @@ function HomePage() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 pt-24 pb-16 text-center">
-        <h1 className="text-5xl font-bold text-gray-900 tracking-tight mb-4">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-20 md:pt-24 pb-16 text-center">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 tracking-tight mb-4">
           Find exactly what<br />
           <span className="text-indigo-500">you&rsquo;re looking for</span>
         </h1>
-        <p className="text-lg text-gray-500 max-w-xl mx-auto mb-10">
+        <p className="text-base sm:text-lg text-gray-500 max-w-xl mx-auto mb-10">
           Typo-tolerant, relevance-ranked search products in 6 categories.
         </p>
         <div className="flex flex-wrap justify-center gap-2">

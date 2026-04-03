@@ -1,4 +1,4 @@
-export type { IProduct } from './types/product.types';
+export type { IProduct, ProductListResponse } from './types/product.types';
 export type {
   SearchResultProduct,
   SearchCategory,

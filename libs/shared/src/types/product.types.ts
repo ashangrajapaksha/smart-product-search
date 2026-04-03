@@ -8,3 +8,8 @@ export interface IProduct {
   stock: number;
   rating: number;
 }
+
+export interface ProductListResponse {
+  total: number;
+  products: IProduct[];
+}

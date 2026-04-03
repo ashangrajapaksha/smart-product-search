@@ -4,6 +4,7 @@ import express, { Application } from 'express';
 import helmet from 'helmet';
 import { corsOptions } from './config/cors.config';
 import { healthRouter } from './routes/health.router';
+import { productsRouter } from './routes/products.router';
 import { searchRouter } from './routes/search.router';
 
 export function createApp(): Application {
@@ -16,6 +17,7 @@ export function createApp(): Application {
   app.use(cookieParser(process.env.COOKIE_SECRET || 'change-me-in-production')); //parses signed cookies
 
   app.use('/api/health', healthRouter);
+  app.use('/api/products', productsRouter);
   app.use('/api/search', searchRouter);
 
   return app;

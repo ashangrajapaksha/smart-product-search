@@ -1,4 +1,4 @@
-import type { SearchResponse } from '@nx-react-nestjs-ts-boilerplate/shared';
+import type { ProductListResponse, SearchResponse } from '@nx-react-nestjs-ts-boilerplate/shared';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -26,4 +26,33 @@ export async function fetchSearch(
   }
 
   return res.json() as Promise<SearchResponse>;
+}
+
+export async function fetchProducts(
+  skip: number,
+  limit: number,
+  signal?: AbortSignal,
+  category?: string
+): Promise<ProductListResponse> {
+  const qs = new URLSearchParams({ skip: String(skip), limit: String(limit) });
+  if (category) qs.set('category', category);
+  const res = await fetch(`${API_BASE}/api/products?${qs}`, { signal });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Failed to fetch products (${res.status})`);
+  }
+
+  return res.json() as Promise<ProductListResponse>;
+}
+
+export async function fetchCategories(signal?: AbortSignal): Promise<string[]> {
+  const res = await fetch(`${API_BASE}/api/products/categories`, { signal });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Failed to fetch categories (${res.status})`);
+  }
+
+  return res.json() as Promise<string[]>;
 }
